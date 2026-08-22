@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "mamba-linkedin-company-presence-mapper": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mambalabsdev/mcp-linkedin-company-presence-mapper"
+      ],
+      "env": {
+        "APIFY_TOKEN": "your-apify-token"
+      }
+    }
+  }
+}
