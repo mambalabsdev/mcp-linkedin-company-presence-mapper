@@ -224,7 +224,7 @@ server.registerTool(
   {
     title: "Map LinkedIn Company Page Presence",
     description:
-      "Resolve a company domain to its LinkedIn company page and return the EXACT follower count, plus the industry, declared company size band, headquarters, founded year and specialties that LinkedIn publishes on the public page. LinkedIn renders every digit, so unlike most social platforms these counts can be summed across a list. Everything comes from the logged out page: no login, no session cookie, no vendor. Employee lists, employee growth and post engagement are NOT reachable logged out and are not returned. A guessed slug that resolves to a different company is reported as identity_mismatch. Read only; requires an APIFY_TOKEN and consumes Apify credits per call.",
+      "Resolve a company domain to its LinkedIn company page, verified against the company's own site, and return the page name, follower count and description as public search results show them. No request is sent to LinkedIn: the page comes from the company homepage (structured data or a link) or from a search result whose name matches the name the company site declares or the company_name you pass. A page that cannot be verified is not returned; the row says why in linkedin_verification. The follower count is the search engine's copy and can lag the live page. Industry, size band, headquarters, founded year, specialties and website are no longer returned. Read only; requires an APIFY_TOKEN and consumes Apify credits per call.",
     annotations: {
       title: "Map LinkedIn Company Page Presence",
       readOnlyHint: true,
@@ -235,25 +235,25 @@ server.registerTool(
     inputSchema: {
       company_domain: z.string()
         .optional()
-        .describe("Bare company domain, for example shopify.com. Supply this or a handle. With a domain the actor runs full discovery; with a handle it skips straight to the fetch."),
+        .describe("Bare company domain, for example shopify.com. Supply this or a handle. With a domain the actor reads the company homepage and searches for its LinkedIn page; with a handle it skips discovery."),
       company_name: z.string()
         .optional()
-        .describe("Optional. Improves search accuracy and is what the identity gate checks a discovered profile against, so supplying it reduces wrong matches."),
+        .describe("Optional. A LinkedIn page whose name is identical to this name verifies (score 80), so supplying it raises the share of companies that get a URL."),
       handle: z.string()
         .optional()
-        .describe("Optional. The company slug from linkedin.com/company/<slug>, for example shopify. Supplying it skips discovery and goes straight to the fetch."),
+        .describe("Optional. The company slug from linkedin.com/company/<slug>, for example shopify. Supplying it skips discovery; the page is returned as given."),
       includeFollowerCounts: z.boolean()
         .optional()
-        .describe("When \"true\" (default) the profile page is fetched and the counts are extracted. Set \"false\" to resolve the profile URL only, which is cheaper and needs no proxy. Sent as a string for Clay compatibility."),
+        .describe("When \"true\" (default) the follower count, page name and description are read from the search result for the page. Set \"false\" to return the URL only. No request is sent to LinkedIn either way."),
       skipCache: z.boolean()
         .optional()
-        .describe("When \"false\" (default) a successful lookup is cached for seven days and reused. Set \"true\" to force a fresh fetch. Sent as a string for Clay compatibility."),
-      includeFirmographics: z.boolean()
+        .describe("When \"false\" (default) a successful lookup is cached for seven days and reused. Set \"true\" to force a fresh lookup."),
+      minConfidenceScore: z.number().int().min(0).max(100)
         .optional()
-        .describe("When \"true\" (default) industry, company size band, headquarters, founded year and website are parsed off the page alongside the follower count. Set \"false\" for the URL and follower count only. Sent as a string for Clay compatibility."),
+        .describe("A page is returned only when its match score is at least this, 0 to 100. Default 70. Homepage sameAs 95, homepage link 92, name identical to the site's declared name 85 or to company_name 80, slug and name matching the domain 75."),
     },
   },
-  async ({ company_domain, company_name, handle, includeFollowerCounts, skipCache, includeFirmographics }) => {
+  async ({ company_domain, company_name, handle, includeFollowerCounts, skipCache, minConfidenceScore }) => {
     return runActor(
       "zOPm6A9JEhUGcIdFW",
       "LinkedIn Company Page Mapper",
@@ -263,7 +263,7 @@ server.registerTool(
         handle,
         includeFollowerCounts: boolToString(includeFollowerCounts),
         skipCache: boolToString(skipCache),
-        includeFirmographics: boolToString(includeFirmographics),
+        minConfidenceScore: minConfidenceScore === undefined ? undefined : String(minConfidenceScore),
       }),
     );
   },

@@ -4,11 +4,15 @@
 
 MCP server for the Mamba Labs **LinkedIn Company Page Mapper** actor on Apify.
 
-Resolve a company domain to its LinkedIn page with the exact follower count and public firmographics.
+Resolve a company domain to its LinkedIn page, verified against the company's own site, with the follower count from search results. No request is sent to LinkedIn.
 
 ## What it does
 
-Resolve a company domain to its LinkedIn company page and return the EXACT follower count, plus the industry, declared company size band, headquarters, founded year and specialties that LinkedIn publishes on the public page. LinkedIn renders every digit, so unlike most social platforms these counts can be summed across a list. Everything comes from the logged out page: no login, no session cookie, no vendor. Employee lists, employee growth and post engagement are NOT reachable logged out and are not returned. A guessed slug that resolves to a different company is reported as identity_mismatch. Read only; requires an APIFY_TOKEN and consumes Apify credits per call.
+Resolve a company domain to its LinkedIn company page, verified against the company's own site, and return the page name, follower count and description as public search results show them. No request is sent to LinkedIn: the page comes from the company homepage (structured data or a link) or from a search result whose name matches the name the company site declares or the company_name you pass. A page that cannot be verified is not returned; the row says why in linkedin_verification. The follower count is the search engine's copy and can lag the live page. Industry, size band, headquarters, founded year, specialties and website are no longer returned. Read only; requires an APIFY_TOKEN and consumes Apify credits per call.
+
+### What changed in 1.2.0
+
+The actor stopped fetching linkedin.com on 2026-10-12. These fields came only from the LinkedIn page and are gone: `linkedin_followers_exact`, `linkedin_industry`, `linkedin_company_size`, `linkedin_headquarters`, `linkedin_founded_year`, `linkedin_specialties`, `linkedin_website`. The `includeFirmographics` input is gone; `minConfidenceScore` is new. New output fields: `linkedin_confidence_score`, `linkedin_verification`.
 
 ## Quick start
 
@@ -31,21 +35,21 @@ Add this to your MCP client configuration:
 - Node.js 18 or newer
 - An Apify API token from [console.apify.com/account/integrations](https://console.apify.com/account/integrations)
 
-The actor is pay per event and consumes Apify credits per call. Prices from the live pricing record, read 2026-10-05:
+The actor is pay per event and consumes Apify credits per call. Prices from the live pricing record, read 2026-10-12:
 
 | Event | Price per event (USD) | Fires when |
 | --- | --- | --- |
 | `apify-actor-start` | $0.00005 | Charged when the Actor starts running. Number of events charged depends on Actor memory (one event per GB, minimum one event). |
-| `company-checked` | $0.004 on the Free plan, down to $0.0028 on higher Apify plans | Once per company for which the discovery cascade completed and a non degraded row was produced, whether or not a LinkedIn profile was found. Does not fire on a degraded row, because on a degraded row no discovery was performed. |
-| `profile-resolved` | $0.003 on the Free plan, down to $0.0021 on higher Apify plans | Once per company whose candidate LinkedIn URL passed the identity gate. Fires on the validation work, not on a populated count. A candidate dropped as an impersonator does not charge: the work was done and the honest answer is that there is no such profile. |
-| `follower-count-extracted` | $0.0025 on the Free plan, down to $0.00175 on higher Apify plans | Once per company where a numeric follower count was read off the public page. Does not fire on not_extractable, blocked, identity_mismatch or url only runs. |
+| `company-checked` | $0.004 on the Free plan, down to $0.0028 on higher Apify plans | Once per company for which discovery completed and a non degraded row was produced, whether or not a LinkedIn page was found. |
+| `profile-resolved` | $0.003 on the Free plan, down to $0.0021 on higher Apify plans | Once per company whose LinkedIn page was verified against the company's own site, the input name, or the domain. |
+| `follower-count-extracted` | $0.0025 on the Free plan, down to $0.00175 on higher Apify plans | Once per company where a follower count was read from the search result for its verified LinkedIn page. No request is sent to LinkedIn. |
 
 This server starts the run at 512 MB, the actor's own default, so a run charges one `apify-actor-start` event. The [actor page](https://apify.com/mambalabs/linkedin-company-presence-mapper) carries the current prices.
 
 ## Example prompts
 
 - "How many LinkedIn followers does gitlab.com have?"
-- "Get the LinkedIn industry, size band and headquarters for stripe.com."
+- "Find the LinkedIn company page for stripe.com and tell me how it was verified."
 - "Rank these domains by LinkedIn follower count: notion.com, figma.com, gitlab.com."
 
 ## Tool and inputs
@@ -54,12 +58,12 @@ Tool: `map_linkedin_company_presence`
 
 | Input | Type | Meaning |
 |---|---|---|
-| `company_domain` | string | Bare company domain, for example shopify.com. Supply this or a handle. With a domain the actor runs full discovery; with a handle it skips straight to |
-| `company_name` | string | Optional. Improves search accuracy and is what the identity gate checks a discovered profile against, so supplying it reduces wrong matches. |
-| `handle` | string | Optional. The company slug from linkedin.com/company/<slug>, for example shopify. Supplying it skips discovery and goes straight to the fetch. |
-| `includeFollowerCounts` | boolean | When "true" (default) the profile page is fetched and the counts are extracted. Set "false" to resolve the profile URL only, which is cheaper and need |
-| `skipCache` | boolean | When "false" (default) a successful lookup is cached for seven days and reused. Set "true" to force a fresh fetch. Sent as a string for Clay compatibi |
-| `includeFirmographics` | boolean | When "true" (default) industry, company size band, headquarters, founded year and website are parsed off the page alongside the follower count. Set "f |
+| `company_domain` | string | Bare company domain, for example shopify.com. Supply this or a handle. |
+| `company_name` | string | Optional. A page whose name is identical to it verifies (score 80). |
+| `handle` | string | Optional. The company slug from linkedin.com/company/<slug>. Skips discovery; returned as given. |
+| `includeFollowerCounts` | boolean | Default true. Reads the follower count, page name and description from the search result. False returns the URL only. |
+| `skipCache` | boolean | Default false. True forces a fresh lookup. |
+| `minConfidenceScore` | integer | Default 70. A page scoring under it is not returned. |
 
 ## Reading the output
 
@@ -69,10 +73,9 @@ first. The vocabulary is the same across the whole Mamba Labs social family:
 | Status | Meaning |
 |---|---|
 | `ok` | fetched and parsed, the value is there |
-| `not_found` | we looked and there is no such profile |
-| `not_extractable` | the profile exists and the value is not on the wire to us |
-| `blocked` | the platform refused us, worth retrying later |
-| `identity_mismatch` | we found a real profile and it belongs to someone else |
+| `not_found` | no page verified; `linkedin_verification` says what was seen and why |
+| `not_extractable` | the page is verified and the search result carries no follower count |
+| `blocked` | the search engine refused the request, worth retrying later |
 | `skipped` | you did not ask for this platform |
 
 **`false` and `null` are never interchangeable.** `false` means we looked and the
