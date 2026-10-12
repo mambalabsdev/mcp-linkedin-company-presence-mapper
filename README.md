@@ -4,11 +4,15 @@
 
 MCP server for the Mamba Labs **LinkedIn Company Page Mapper** actor on Apify.
 
-Resolve a company domain to its LinkedIn page, verified against the company's own site, with the follower count from search results. No request is sent to LinkedIn.
+Free. Resolve a company domain to its LinkedIn page, verified against the company's own site, with its name and tagline, and a follower count on some companies. No firmographics. No request is sent to LinkedIn.
 
 ## What it does
 
-Resolve a company domain to its LinkedIn company page, verified against the company's own site, and return the page name, follower count and description as public search results show them. No request is sent to LinkedIn: the page comes from the company homepage (structured data or a link) or from a search result whose name matches the name the company site declares or the company_name you pass. A page that cannot be verified is not returned; the row says why in linkedin_verification. The follower count is the search engine's copy and can lag the live page. Industry, size band, headquarters, founded year, specialties and website are no longer returned. Read only; requires an APIFY_TOKEN and consumes Apify credits per call.
+Free to run apart from Apify's start fee. Resolve a company domain to its LinkedIn company page, verified against the company's own site, and return the page name and tagline, plus a follower count when public search results show one (2 of 6 test domains on 2026-10-12). No request is sent to LinkedIn: the page comes from the company homepage (structured data or a link) or from a search result whose name matches the name the company site declares or the company_name you pass. A page that cannot be verified is not returned; the row says why in linkedin_verification. The follower count is the search engine's copy and can lag the live page. Industry, size band, headquarters, founded year, specialties and website are no longer returned. Read only; requires an APIFY_TOKEN and consumes Apify credits per call.
+
+### What changed in 1.2.1
+
+The actor is free: its three paid events were removed on 2026-10-12. The text now states the measured rates: a verified page on most companies, a follower count on some, no firmographics.
 
 ### What changed in 1.2.0
 
@@ -35,22 +39,15 @@ Add this to your MCP client configuration:
 - Node.js 18 or newer
 - An Apify API token from [console.apify.com/account/integrations](https://console.apify.com/account/integrations)
 
-The actor is pay per event and consumes Apify credits per call. Prices from the live pricing record, read 2026-10-12:
+The actor is free. Since 2026-10-12 it declares no paid event, so the only charge is Apify's platform start event, `apify-actor-start`, at $0.00005 per GB of run memory. This server starts the run at 512 MB, the actor's own default, so a run costs $0.00005 whatever the number of companies. The [actor page](https://apify.com/mambalabs/linkedin-company-presence-mapper) carries the current pricing.
 
-| Event | Price per event (USD) | Fires when |
-| --- | --- | --- |
-| `apify-actor-start` | $0.00005 | Charged when the Actor starts running. Number of events charged depends on Actor memory (one event per GB, minimum one event). |
-| `company-checked` | $0.004 on the Free plan, down to $0.0028 on higher Apify plans | Once per company for which discovery completed and a non degraded row was produced, whether or not a LinkedIn page was found. |
-| `profile-resolved` | $0.003 on the Free plan, down to $0.0021 on higher Apify plans | Once per company whose LinkedIn page was verified against the company's own site, the input name, or the domain. |
-| `follower-count-extracted` | $0.0025 on the Free plan, down to $0.00175 on higher Apify plans | Once per company where a follower count was read from the search result for its verified LinkedIn page. No request is sent to LinkedIn. |
-
-This server starts the run at 512 MB, the actor's own default, so a run charges one `apify-actor-start` event. The [actor page](https://apify.com/mambalabs/linkedin-company-presence-mapper) carries the current prices.
+What it returns, measured 2026-10-12 on 6 domains: a verified page URL, name and tagline on 5, a follower count on 2, firmographics on none.
 
 ## Example prompts
 
-- "How many LinkedIn followers does gitlab.com have?"
+- "What is the LinkedIn company page for gitlab.com, and what does its tagline say?"
 - "Find the LinkedIn company page for stripe.com and tell me how it was verified."
-- "Rank these domains by LinkedIn follower count: notion.com, figma.com, gitlab.com."
+- "Find the LinkedIn pages for notion.com, figma.com and gitlab.com, with follower counts where they are available."
 
 ## Tool and inputs
 
