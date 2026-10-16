@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.mambabuilt/mcp-linkedin-company-presence-mapper",
   "description": "Free. Resolve a company domain to its verified LinkedIn page, name and tagline.",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "repository": {
     "url": "https://github.com/mambalabsdev/mcp-linkedin-company-presence-mapper",
     "source": "github"
@@ -11,7 +11,7 @@
     {
       "registryType": "npm",
       "identifier": "@mambalabsdev/mcp-linkedin-company-presence-mapper",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "transport": {
         "type": "stdio"
       },

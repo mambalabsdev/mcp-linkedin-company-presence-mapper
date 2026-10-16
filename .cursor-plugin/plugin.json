@@ -1,7 +1,7 @@
 {
   "name": "mcp-linkedin-company-presence-mapper",
   "displayName": "LinkedIn Company Page Mapper",
-  "version": "1.0.0",
+  "version": "1.2.2",
   "description": "MCP server for the Mamba Labs LinkedIn Company Page Mapper actor on Apify. Resolve a company domain to its LinkedIn page, verified against the company's own site, with follower count from search results. No request to LinkedIn.",
   "author": {
     "name": "Mamba Labs",
