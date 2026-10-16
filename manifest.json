@@ -1,7 +1,7 @@
 {
   "manifest_version": "0.3",
   "name": "mcp-linkedin-company-presence-mapper",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "MCP server that resolves a company domain to its verified LinkedIn page, with name and tagline, and a follower count on some companies. Free actor.",
   "author": {
     "name": "Mamba Labs"

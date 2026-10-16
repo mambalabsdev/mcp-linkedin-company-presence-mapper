@@ -227,7 +227,7 @@ server.registerTool(
       "Free to run apart from Apify's start fee. Resolve a company domain to its LinkedIn company page, verified against the company's own site, and return the page name and tagline, plus a follower count when public search results show one (2 of 6 test domains on 2026-10-12). No request is sent to LinkedIn: the page comes from the company homepage (structured data or a link) or from a search result whose name matches the name the company site declares or the company_name you pass. A page that cannot be verified is not returned; the row says why in linkedin_verification. The follower count is the search engine's copy and can lag the live page. Industry, size band, headquarters, founded year, specialties and website are no longer returned. Read only; requires an APIFY_TOKEN and consumes Apify credits per call.",
     annotations: {
       title: "Map LinkedIn Company Page Presence",
-      readOnlyHint: true,
+      readOnlyHint: false,
       destructiveHint: false,
       idempotentHint: true,
       openWorldHint: true,
