@@ -2,6 +2,8 @@
 
 [![Smithery](https://smithery.ai/badge/mambabuilt/mcp-linkedin-company-presence-mapper)](https://smithery.ai/servers/mambabuilt/mcp-linkedin-company-presence-mapper) [![Glama score](https://glama.ai/mcp/servers/mambalabsdev/mcp-linkedin-company-presence-mapper/badges/score.svg)](https://glama.ai/mcp/servers/mambalabsdev/mcp-linkedin-company-presence-mapper) [![npm version](https://img.shields.io/npm/v/@mambalabsdev/mcp-linkedin-company-presence-mapper)](https://www.npmjs.com/package/@mambalabsdev/mcp-linkedin-company-presence-mapper) [![npm downloads](https://img.shields.io/npm/dm/@mambalabsdev/mcp-linkedin-company-presence-mapper)](https://www.npmjs.com/package/@mambalabsdev/mcp-linkedin-company-presence-mapper) [![license](https://img.shields.io/github/license/mambalabsdev/mcp-linkedin-company-presence-mapper)](https://github.com/mambalabsdev/mcp-linkedin-company-presence-mapper/blob/main/LICENSE)
 
+<a href="https://mcprush.com/to/linkedin-company-presence-mapper-mcp?ref=badge"><img width="380" height="200" src="https://mcprush.com/badge/linkedin-company-presence-mapper-mcp/card.svg" alt="LinkedIn Company Presence Mapper MCP server" /></a>
+
 MCP server for the Mamba Labs **LinkedIn Company Page Mapper** actor on Apify.
 
 Free. Resolve a company domain to its LinkedIn page, verified against the company's own site, with its name and tagline, and a follower count on some companies. No firmographics. No request is sent to LinkedIn.
